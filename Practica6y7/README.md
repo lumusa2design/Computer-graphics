@@ -824,13 +824,30 @@ Y finalmente renderiza la escena.
 
 ### Video de interacción del usuario promedio
 
+
 <video controls width="600">
-  <source src="media/DEMO_USUARIO.mp4" type="video/mp4">
+  <source src="./media/DEMO_USUARIO.mp4" type="video/mp4">
 </video>
+
+Si no se visualizara puedes acceder directamente a él:
+
+- [enlace al video](./media/DEMO_USUARIO.mp4)
+
+En este caso el video es para vender la práctica, por lo que se muestra un caso sin errores, en un sistema ideal de interacción con el usuario, presentando las mejores partes de la práctica.
 
 ### Video técnico
 
+<video controls width="600">
+  <source src="./media/TECNICA.mp4" type="video/mp4">
+</video>
 
+Si no se visualizara puedes acceder directamente a él:
+
+- [enlace al video](./media/DEMO_TECNICA.mp4)
+
+
+Este video técnico no tiene una intención de mostrar la parte "bonita de la práctica" sino resaltar detalles técnicos de la misma, todo lo mencionado de los campos estelares, las curvas de Bezier, el paralelizaje suave, cosas que el usuario no tiene porque fijarse, pero ha sido parte de la práctica. 
+Aquí se incluyen cosas que por tiempo, no he podido mejorar. 
 
 ## Autores y Reconocimiento
 
