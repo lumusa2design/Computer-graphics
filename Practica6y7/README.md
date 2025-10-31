@@ -631,13 +631,198 @@ function crearProtuberancia(rBase, rOut) {
   prominences.push(mesh);
 }
 ```
-Traza una [Curva de Bezier](https://es.javascript.info/bezier-curve)
+Traza una [Curva de Bezier](https://es.javascript.info/bezier-curve) y la vuelve en un tubo, y le da un material transparente dando la sensación de erupciones solares.
+
+```js
+function generarSpriteCircular() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 128;
+  canvas.height = 128;
+  const ctx = canvas.getContext("2d");
+  const g = ctx.createRadialGradient(64, 64, 10, 64, 64, 64);
+  g.addColorStop(0, "rgba(255,220,80,1)");
+  g.addColorStop(0.4, "rgba(255,140,0,0.85)");
+  g.addColorStop(1, "rgba(255,80,0,0)");
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.arc(64, 64, 64, 0, Math.PI * 2);
+  ctx.fill();
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.needsUpdate = true;
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+```
+Genera los sprites de las partículas que se podrá reutilizar en otros elementos. En este caso en el sol, por ello se le da un tono rojizo.
+
+Usamos partículas porque son mejores a la hora de generar de forma masiva que geometría pura.
+
+
 ### Fondo
+
+```js
+function crearCampoEstrellas({
+  cantidad = 4000,
+  radioInterno = 120,
+  radioExterno = 140,
+  size = 0.03,
+  opacidad = 0.9,
+  rotacionLenta = new THREE.Vector3(0.00002, 0.00003, 0),
+} = {}) {
+  const posiciones = new Float32Array(cantidad * 3);
+  for (let i = 0; i < cantidad; i++) {
+    const u = Math.random();
+    const v = Math.random();
+    const theta = 2 * Math.PI * u;
+    const phi = Math.acos(2 * v - 1);
+    const dir = new THREE.Vector3(
+      Math.sin(phi) * Math.cos(theta),
+      Math.sin(phi) * Math.sin(theta),
+      Math.cos(phi)
+    );
+    const r = radioInterno + Math.random() * (radioExterno - radioInterno);
+    const p = dir.multiplyScalar(r);
+    posiciones[i * 3] = p.x;
+    posiciones[i * 3 + 1] = p.y;
+    posiciones[i * 3 + 2] = p.z;
+  }
+  const geom = new THREE.BufferGeometry();
+  geom.setAttribute("position", new THREE.BufferAttribute(posiciones, 3));
+  const mat = new THREE.PointsMaterial({
+    size: size,
+    depthWrite: false,
+    transparent: true,
+    opacity: opacidad,
+    sizeAttenuation: true,
+  });
+  const estrellas = new THREE.Points(geom, mat);
+  estrellas.userData.rotacionLenta = rotacionLenta;
+  scene.add(estrellas);
+  return estrellas;
+}
+```
+Crea puntos en una esfera hueca con su propia rotación con puntos. Se menciona tambien en el paralelaje.
+
+```js
+function crearSkyboxNebulosa(size = 1200) {
+  const geo = new THREE.BoxGeometry(size, size, size);
+  nebulaMaterial = new THREE.ShaderMaterial({
+    side: THREE.BackSide,
+    uniforms: {
+      time: { value: 0 },
+      intensity: { value: 1.2 },
+      gain: { value: 0.55 },
+      lacunarity: { value: 2.1 },
+      scale: { value: 1.6 },
+      tint1: { value: new THREE.Color(0x2c2e66) },
+      tint2: { value: new THREE.Color(0x712b75) },
+      stars: { value: 0.85 },
+    },
+    vertexShader: `
+      varying vec3 vWorldPos;
+      void main() {
+        vec4 wp = modelMatrix * vec4(position, 1.0);
+        vWorldPos = wp.xyz;
+        gl_Position = projectionMatrix * viewMatrix * wp;
+      }
+    `,
+    fragmentShader: `
+      precision highp float;
+      varying vec3 vWorldPos;
+      uniform float time;
+      uniform float intensity;
+      uniform float gain;
+      uniform float lacunarity;
+      uniform float scale;
+      uniform vec3 tint1;
+      uniform vec3 tint2;
+      uniform float stars;
+
+      float hash(vec3 p){
+        p = fract(p * 0.3183099 + vec3(0.1,0.2,0.3));
+        p *= 17.0;
+        return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
+      }
+
+      float noise(vec3 p){
+        vec3 i = floor(p);
+        vec3 f = fract(p);
+        f = f*f*(3.0-2.0*f);
+        float n000 = hash(i + vec3(0,0,0));
+        float n100 = hash(i + vec3(1,0,0));
+        float n010 = hash(i + vec3(0,1,0));
+        float n110 = hash(i + vec3(1,1,0));
+        float n001 = hash(i + vec3(0,0,1));
+        float n101 = hash(i + vec3(1,0,1));
+        float n011 = hash(i + vec3(0,1,1));
+        float n111 = hash(i + vec3(1,1,1));
+        float n00 = mix(n000, n100, f.x);
+        float n01 = mix(n001, n101, f.x);
+        float n10 = mix(n010, n110, f.x);
+        float n11 = mix(n011, n111, f.x);
+        float n0 = mix(n00, n10, f.y);
+        float n1 = mix(n01, n11, f.y);
+        return mix(n0, n1, f.z);
+      }
+
+      float fbm(vec3 p){
+        float v = 0.0;
+        float a = 0.5;
+        vec3 pp = p;
+        for(int i=0; i<6; i++){
+          v += a * noise(pp);
+          pp *= lacunarity;
+          a *= gain;
+        }
+        return v;
+      }
+
+      mat3 rot3(float a, float b, float c){
+        float ca = cos(a), sa = sin(a);
+        float cb = cos(b), sb = sin(b);
+        float cc = cos(c), sc = sin(c);
+        return mat3(
+          cb*cc, -cb*sc, sb,
+          sa*sb*cc+ca*sc, -sa*sb*sc+ca*cc, -sa*cb,
+          -ca*sb*cc+sa*sc, ca*sb*sc+sa*cc, ca*cb
+        );
+      }
+
+      void main() {
+        vec3 dir = normalize(vWorldPos);
+        vec3 p = rot3(time*0.02, time*0.015, time*0.01) * dir * scale;
+        float n1 = fbm(p + vec3(0.0, 3.7, 1.3));
+        float n2 = fbm(p * 1.9 + vec3(2.3, -1.7, 0.5));
+        float neb = smoothstep(0.25, 0.9, n1*0.7 + n2*0.6);
+        vec3 nebula = mix(tint1, tint2, neb) * intensity;
+        float st = pow(max(noise(dir*150.0 + time*0.2), 0.0), 24.0) * stars;
+        float sparkle = step(0.995, noise(dir*240.0 + time*0.7)) * 0.9;
+        vec3 col = nebula + vec3(st + sparkle);
+        col = col * (0.7 + 0.3 * dot(dir, vec3(0.0,1.0,0.0)));
+        gl_FragColor = vec4(col, 1.0);
+      }
+    `,
+  });
+  nebulaMesh = new THREE.Mesh(geo, nebulaMaterial);
+  scene.add(nebulaMesh);
+}
+```
+
+Crea una skybox y usamos un shaderMaterial procedural usando hash noise, colores y el tiempo para animarlo gracias a time.
+
 ### Animación
 
 ```js
-
+const delta = clock.getDelta();
+timestamp = (Date.now() - t0) * accglobal * (params ? params.velocidad : 1.0);
+requestAnimationFrame(animationLoop);
 ```
+
+Avanza uniformemente la nebulosa, las partículas y el halo solar.
+A su vez controla la inclinación y rotación de cada planeta a lo largo del tiempo.
+
+Y finalmente renderiza la escena.
+
+
 ## Autores y Reconocimiento
 
 
