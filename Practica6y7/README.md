@@ -2,19 +2,17 @@
 
 [![Texto en movimiento](https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=25&duration=1500&pause=9000&color=8A36D2&center=true&vCenter=true&width=400&height=50&lines=Informática+gráfica)]()
 
----
-<div style="center">
 
-[![Abrir Notebook](https://img.shields.io/badge/📘%20Jupyter-Notebook-F37626?style=for-the-badge&logo=jupyter&logoColor=white)](https://github.com/lumusa2design/Computer-Visualization/blob/main/prac1/VC_P1.ipynb)
-
-</div>
 
 
 ---
 
-![Python](https://img.shields.io/badge/python-3.10-blue?logo=python)
-![OpenCV](https://img.shields.io/badge/OpenCV-Enabled-green?logo=opencv)
-![Matplotlib](https://img.shields.io/badge/Matplotlib-Graphs-orange?logo=plotly)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES2020+-yellow?logo=javascript)
+![Three.js](https://img.shields.io/badge/Three.js-r160-black?logo=three.js)
+![WebGL](https://img.shields.io/badge/WebGL-2.0-990000?logo=webgl)
+![lil-gui](https://img.shields.io/badge/lil--gui-UI%20controls-4B8BBE)
+![GLSL](https://img.shields.io/badge/GLSL-Shaders-8A2BE2)
+
 
 </div>
 
@@ -460,7 +458,7 @@ function crearCampoEstrellas({
   const geom = new THREE.BufferGeometry();
   geom.setAttribute("position", new THREE.BufferAttribute(posiciones, 3));
   const mat = new THREE.PointsMaterial({
-    size: tamanyo,
+    size: size,
     depthWrite: false,
     transparent: true,
     opacity: opacidad,
@@ -822,6 +820,9 @@ A su vez controla la inclinación y rotación de cada planeta a lo largo del tie
 
 Y finalmente renderiza la escena.
 
+## Videos de la práctica
+
+
 
 ## Autores y Reconocimiento
 
@@ -840,7 +841,24 @@ Y finalmente renderiza la escena.
 
 --- 
 ## Recursos usados
+En general se ha usado la [API](https://threejs.org/docs/) de `three.js` dado que tiene muchos elementos explicados de forma exhaustiva de como usarse y la documentación introductoria del profesorado que mencionamos anteriormente. Algunos ejemplos relevantes de three.js son:
 
+- [`Orbit Controls`](https://threejs.org/docs/#OrbitControls): para el control suave de la camara.
+- [`Raycasting`](https://threejs.org/docs/#OrbitControls): para la selección de planeta por clicks.
+- [`Texturas`](https://threejs.org/docs/#materials) para añadir texturas
+- [`Partículas`](https://threejs.org/docs/#Points)
+
+Pero además use recursos varios como:
+
+ `stack overflow`: https://stackoverflow.com/questions/71670519/how-to-make-particles-in-threejs-take-the-shape-of-a-model-object-onscroll
+
+ `three.js journey`:https://threejs-journey.com/lessons/particles#points
+
+ Uso de Chatgpt para:
+ - Perfeccionamiento del Readme 
+ - Corrección de errores
+ - Guía explicativa de funciones de Three.js.
+ - Ajustador de parámetros
 
 
 

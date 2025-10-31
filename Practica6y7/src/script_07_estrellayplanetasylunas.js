@@ -20,6 +20,7 @@ const PROM_COUNT = 6;
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 let nebulaMesh, nebulaMaterial;
+let followIndex = -1;
 
 init();
 animationLoop();
@@ -81,6 +82,7 @@ function init() {
     offX: 3,
     offY: 2,
     offZ: 3,
+    modoCamara: "Libre",
   };
   const folder = gui.addFolder("Controles");
   folder.add(params, "velocidad", 0, 5, 0.1).name("Velocidad");
@@ -159,6 +161,10 @@ function init() {
       displacementScale: 0.1,
       specularMap: "src/textures/earth/earth_specular.png",
       shininess: 20,
+      cloudsMap: "src/textures/earth/earthcloudmaptrans.jpg",
+      cloudsOpacity: 0.7,
+      cloudsSpeed: 0.03,
+      cloudsScale: 1.1,
     },
   });
 
@@ -231,7 +237,7 @@ function init() {
     cantidad: 4500,
     radioInterno: 120,
     radioExterno: 140,
-    tamanyo: 0.035,
+    size: 0.035,
     opacidad: 0.95,
     rotacionLenta: new THREE.Vector3(0, 0.00002, 0),
   });
@@ -239,18 +245,25 @@ function init() {
     cantidad: 2500,
     radioInterno: 180,
     radioExterno: 200,
-    tamanyo: 0.05,
+    size: 0.05,
     opacidad: 0.5,
     rotacionLenta: new THREE.Vector3(0.000015, 0, 0),
   });
 
-  const nombres = Planetas.map((p) => p.userData.nombre);
+  const nombres = ["Libre", ...Planetas.map((p) => p.userData.nombre)];
   planetSelector = camFolder
-    .add({ planeta: "Tierra" }, "planeta", nombres)
-    .name("Elegir planeta")
+    .add({ modo: "Libre" }, "modo", nombres)
+    .name("Modo")
     .onChange((v) => {
-      const idx = nombres.indexOf(v);
-      if (idx >= 0) focusPlanetByIndex(idx);
+      if (v === "Libre") {
+        followIndex = -1;
+      } else {
+        const idx = Planetas.findIndex((p) => p.userData.nombre === v);
+        if (idx >= 0) {
+          followIndex = idx;
+          focusPlanetByIndex(idx);
+        }
+      }
     });
 
   t0 = Date.now();
@@ -294,6 +307,8 @@ function onClickFocus(event) {
     camera.position.copy(target);
     orbit.target.copy(pos);
     orbit.update();
+    const idx = Planetas.findIndex((p) => p.userData.mesh === hits[0].object);
+    if (idx >= 0) followIndex = idx;
   }
 }
 
@@ -521,13 +536,27 @@ function Planeta({
     displacementScale = 0.0,
     specularMap,
     shininess = 30,
+    cloudsMap,
+    cloudsOpacity = 0.85,
+    cloudsSpeed = 0.008,
+    cloudsScale = 1.01,
   } = textures;
+
   const loadMaybe = (url) => (url ? textureLoader.load(url) : null);
   const texMap = loadMaybe(map);
   if (texMap) texMap.colorSpace = THREE.SRGBColorSpace;
   const texNormal = loadMaybe(normalMap);
   const texDisp = loadMaybe(displacementMap);
   const texSpec = loadMaybe(specularMap);
+  const texClouds = loadMaybe(cloudsMap);
+  if (texClouds) {
+    texClouds.colorSpace = THREE.SRGBColorSpace;
+    texClouds.anisotropy =
+      (renderer.capabilities.getMaxAnisotropy &&
+        renderer.capabilities.getMaxAnisotropy()) ||
+      1;
+    texClouds.wrapS = texClouds.wrapT = THREE.RepeatWrapping;
+  }
 
   let material;
   if (texNormal || texDisp || texSpec) {
@@ -564,9 +593,28 @@ function Planeta({
   const mesh = new THREE.Mesh(geom, material);
   tiltNode.add(mesh);
 
+  let cloudsMesh = null;
+  if (texClouds) {
+    const cloudsGeom = new THREE.SphereGeometry(radio * cloudsScale, 64, 32);
+    const cloudsMat = new THREE.MeshPhongMaterial({
+      map: texClouds,
+      alphaMap: texClouds,
+      transparent: true,
+      opacity: cloudsOpacity,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+      shininess: 0,
+    });
+    cloudsMesh = new THREE.Mesh(cloudsGeom, cloudsMat);
+    cloudsMesh.renderOrder = 1;
+    tiltNode.add(cloudsMesh);
+  }
+
   tiltNode.userData = {
     pivot,
     mesh,
+    cloudsMesh,
+    cloudsSpeed,
     dist,
     speed: vel,
     f1,
@@ -609,7 +657,7 @@ function crearCampoEstrellas({
   cantidad = 4000,
   radioInterno = 120,
   radioExterno = 140,
-  tamanyo = 0.03,
+  size = 0.03,
   opacidad = 0.9,
   rotacionLenta = new THREE.Vector3(0.00002, 0.00003, 0),
 } = {}) {
@@ -633,7 +681,7 @@ function crearCampoEstrellas({
   const geom = new THREE.BufferGeometry();
   geom.setAttribute("position", new THREE.BufferAttribute(posiciones, 3));
   const mat = new THREE.PointsMaterial({
-    size: tamanyo,
+    size: size,
     depthWrite: false,
     transparent: true,
     opacity: opacidad,
@@ -771,6 +819,7 @@ function animationLoop() {
     const z3 = y * sy;
     ud.pivot.position.set(x, y3, z3);
     ud.mesh.rotation.y += ud.spin;
+    if (ud.cloudsMesh) ud.cloudsMesh.rotation.y += ud.cloudsSpeed;
     const rot = Orbitas[i];
     if (rot) rot.rotation.z += ud.rotacionOrbital * 0.001;
   }
@@ -780,6 +829,16 @@ function animationLoop() {
       Math.cos(timestamp * object.userData.speed) * object.userData.dist;
     object.position.y =
       Math.sin(timestamp * object.userData.speed) * object.userData.dist;
+  }
+
+  if (followIndex >= 0 && Planetas[followIndex]) {
+    const pos = new THREE.Vector3();
+    Planetas[followIndex].userData.mesh.getWorldPosition(pos);
+    const desired = pos
+      .clone()
+      .add(new THREE.Vector3(params.offX, params.offY, params.offZ));
+    camera.position.lerp(desired, 0.12);
+    orbit.target.lerp(pos, 0.12);
   }
 
   orbit.update();
