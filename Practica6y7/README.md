@@ -176,6 +176,14 @@ Todos los conocimientos básicos para empezar la práctica se encuentran en el R
 ## Modificaciones realizadas al código base
 Podemos dividir nuestros cambios en 9 bloques funcionales, a saber: 
 - Inicialización
+- Planetas, estrellas y anillos
+- Campo estelar
+- Selector de planetas
+- Tiempo
+- Funciones auxiliares
+- Sol
+- Fondo
+- Animación
 
 ### bloque de inicialización
 
@@ -417,13 +425,219 @@ function Luna(planetNode, radio, dist, vel, col, angle) {
 ```
 Añade modificadores para el material, y una jerarquía de pivote
 
-## Campo estelar
+### Campo estelar
 
 Hacemos una animación con paralelaje suave para el campo estelar. El paralelaje es la sensación visual de que una parte del fondo se mueve a diferente velocidad que otra dando una sensación de movimiento.
 
 ![paralelaje](./media/Parallax_scrolling_example_scene.gif)
 
+```js
+function crearCampoEstrellas({
+  cantidad = 4000,
+  radioInterno = 120,
+  radioExterno = 140,
+  size = 0.03,
+  opacidad = 0.9,
+  rotacionLenta = new THREE.Vector3(0.00002, 0.00003, 0),
+} = {}) {
+  const posiciones = new Float32Array(cantidad * 3);
+  for (let i = 0; i < cantidad; i++) {
+    const u = Math.random();
+    const v = Math.random();
+    const theta = 2 * Math.PI * u;
+    const phi = Math.acos(2 * v - 1);
+    const dir = new THREE.Vector3(
+      Math.sin(phi) * Math.cos(theta),
+      Math.sin(phi) * Math.sin(theta),
+      Math.cos(phi)
+    );
+    const r = radioInterno + Math.random() * (radioExterno - radioInterno);
+    const p = dir.multiplyScalar(r);
+    posiciones[i * 3] = p.x;
+    posiciones[i * 3 + 1] = p.y;
+    posiciones[i * 3 + 2] = p.z;
+  }
+  const geom = new THREE.BufferGeometry();
+  geom.setAttribute("position", new THREE.BufferAttribute(posiciones, 3));
+  const mat = new THREE.PointsMaterial({
+    size: tamanyo,
+    depthWrite: false,
+    transparent: true,
+    opacity: opacidad,
+    sizeAttenuation: true,
+  });
+  const estrellas = new THREE.Points(geom, mat);
+  estrellas.userData.rotacionLenta = rotacionLenta;
+  scene.add(estrellas);
+  return estrellas;
+```
+Creamos un firmamento 3D con varias estrells que se añadiran en forma de dos cúpulas una inerna y otra externa. Esto provocará, gracias al paralelaje sensación de profundidad.
 
+### Selector del planetas
+```js
+const nombres = Planetas.map((p) => p.userData.nombre);
+planetSelector = camFolder
+  .add({ planeta: "Tierra" }, "planeta", nombres)
+  .name("Elegir planeta")
+  .onChange((v) => { const idx = nombres.indexOf(v); if (idx >= 0) focusPlanetByIndex(idx); });
+```
+Añade un desplegable que permite que la cambie su posición al del planeta y lo siga
+### Tiempo
+
+```js
+t0 = Date.now();
+window.addEventListener("resize", onResize);
+window.addEventListener("click", onClickFocus);
+```
+Habilita el reescalado y permite seleccionar planeta con un click,
+
+### Funciones auxiliares
+
+```js
+const node = Planetas[idx];
+node.userData.mesh.getWorldPosition(pos);
+camera.position.copy(pos.clone().add(new THREE.Vector3(params.offX, params.offY, params.offZ)));
+orbit.target.copy(pos); orbit.update()
+```
+Es la función que permite cambiar el transform de la cámara a la del planeta centrando su vista
+
+```js
+
+function onResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+```
+Mantiene la relación del tamaño de cámara y reescala su  relación de aspecto y su proyección al cambiar el tamaño.
+
+```js
+
+function onClickFocus(event) {
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const meshes = Planetas.map((p) => p.userData && p.userData.mesh).filter(
+    Boolean
+  );
+  const hits = raycaster.intersectObjects(meshes, false);
+  if (hits.length > 0) {
+    const pos = new THREE.Vector3();
+    hits[0].object.getWorldPosition(pos);
+    const target = pos
+      .clone()
+      .add(new THREE.Vector3(params.offX, params.offY, params.offZ));
+    camera.position.copy(target);
+    orbit.target.copy(pos);
+    orbit.update();
+    const idx = Planetas.findIndex((p) => p.userData.mesh === hits[0].object);
+    if (idx >= 0) followIndex = idx;
+  }
+}
+```
+Cambia las coordinadas de la camara al clickear sobre el planeta
+
+###  Sol
+
+En este, tenemos que mirar la funcion estrella que se menciona antes en el documento, pero además añadí las siguientes funciones:
+
+```js
+function CoronaParticulas(count, rMin, rMax) {
+  const positions = new Float32Array(count * 3);
+  const colors = new Float32Array(count * 3);
+  const hues = new Float32Array(count);
+  const phases = new Float32Array(count);
+  for (let i = 0; i < count; i++) {
+    const r = rMin + Math.random() * (rMax - rMin);
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    const x = r * Math.sin(phi) * Math.cos(theta);
+    const y = r * Math.sin(phi) * Math.sin(theta);
+    const z = r * Math.cos(phi);
+    positions[i * 3] = x;
+    positions[i * 3 + 1] = y;
+    positions[i * 3 + 2] = z;
+    const h = 0.05 + Math.random() * 0.08;
+    hues[i] = h;
+    phases[i] = Math.random() * Math.PI * 2;
+    const c = new THREE.Color().setHSL(h, 1, 0.6);
+    colors[i * 3] = c.r;
+    colors[i * 3 + 1] = c.g;
+    colors[i * 3 + 2] = c.b;
+  }
+  const geom = new THREE.BufferGeometry();
+  geom.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  geom.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+  geom.userData = { hues, phases, rMin, rMax };
+  const sprite = generarSpriteCircular();
+  const mat = new THREE.PointsMaterial({
+    size: BASE_PARTICLE_SIZE,
+    map: sprite,
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    vertexColors: true,
+    sizeAttenuation: true,
+  });
+  const corona = new THREE.Points(geom, mat);
+  scene.add(corona);
+}
+```
+
+Genera `count` partículas en un cascarón esférico entre radios `rMin`..`rMax`, con colores en HSL y fases para animación posterior.
+
+Creando un halo de partículas de la corona solar.
+
+```js
+function crearProtuberancia(rBase, rOut) {
+  const a = Math.random() * Math.PI * 2;
+  const tilt = (Math.random() - 0.5) * 0.6;
+  const p0 = new THREE.Vector3(
+    Math.cos(a) * rBase,
+    Math.sin(a) * rBase,
+    0
+  ).applyAxisAngle(new THREE.Vector3(0, 1, 0), tilt);
+  const p1 = p0
+    .clone()
+    .multiplyScalar(1.15)
+    .add(new THREE.Vector3(0, 0, 0.2 + Math.random() * 0.4));
+  const p2 = p0
+    .clone()
+    .setLength((rBase + rOut) * 0.5)
+    .add(new THREE.Vector3(0, 0, 0.6 + Math.random() * 0.6));
+  const p3 = p0.clone().setLength(rOut);
+  const curve = new THREE.CubicBezierCurve3(p0, p1, p2, p3);
+  const path = curve.getPoints(80);
+  const geom = new THREE.TubeGeometry(
+    new THREE.CatmullRomCurve3(path),
+    80,
+    0.03,
+    8,
+    false
+  );
+  const mat = new THREE.MeshBasicMaterial({
+    color: 0xffe066,
+    transparent: true,
+    opacity: 0.0,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+  });
+  const mesh = new THREE.Mesh(geom, mat);
+  mesh.userData = {
+    t: Math.random() * Math.PI * 2,
+    speed: 0.8 + Math.random() * 0.6,
+  };
+  scene.add(mesh);
+  prominences.push(mesh);
+}
+```
+Traza una [Curva de Bezier](https://es.javascript.info/bezier-curve)
+### Fondo
+### Animación
+
+```js
+
+```
 ## Autores y Reconocimiento
 
 
