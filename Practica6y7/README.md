@@ -832,6 +832,7 @@ Y finalmente renderiza la escena.
 Si no se visualizara puedes acceder directamente a él:
 
 - [enlace al video](./media/DEMO_USUARIO.mp4)
+- [Youtube](https://youtu.be/YvsNpEBmvUQ)
 
 En este caso el video es para vender la práctica, por lo que se muestra un caso sin errores, en un sistema ideal de interacción con el usuario, presentando las mejores partes de la práctica.
 
@@ -844,6 +845,8 @@ En este caso el video es para vender la práctica, por lo que se muestra un caso
 Si no se visualizara puedes acceder directamente a él:
 
 - [enlace al video](./media/DEMO_TECNICA.mp4)
+
+- [Youtube](https://youtu.be/-4D8w0av7qc)
 
 
 Este video técnico no tiene una intención de mostrar la parte "bonita de la práctica" sino resaltar detalles técnicos de la misma, todo lo mencionado de los campos estelares, las curvas de Bezier, el paralelizaje suave, cosas que el usuario no tiene porque fijarse, pero ha sido parte de la práctica. 
