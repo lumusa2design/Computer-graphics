@@ -879,6 +879,10 @@ Pero además use recursos varios como:
 
  `three.js journey`:https://threejs-journey.com/lessons/particles#points
 
+- texturas de las nubes: https://www.solarsystemscope.com/textures/
+
+- mapas de normales: https://cpetry.github.io/NormalMap-Online/
+
  Uso de Chatgpt para:
  - Perfeccionamiento del Readme 
  - Corrección de errores
