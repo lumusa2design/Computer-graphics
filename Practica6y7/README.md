@@ -821,6 +821,9 @@ A su vez controla la inclinación y rotación de cada planeta a lo largo del tie
 Y finalmente renderiza la escena.
 
 ## Videos de la práctica
+<video controls width="600">
+  <source src="media/DEMO_USUARIO.mp4" type="video/mp4">
+</video>
 
 
 
