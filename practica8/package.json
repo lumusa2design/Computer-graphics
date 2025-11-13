@@ -1,0 +1,17 @@
+{
+  "name": "threejs-ig-eii",
+  "version": "1.0.0",
+  "description": "IG-EII",
+  "main": "index.html",
+  "scripts": {
+    "start": "parcel ./src/index.html --open",
+    "build": "parcel build ./src/index.html"
+  },
+  "dependencies": {
+    "three": "0.152.1"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.6.1"
+  },
+  "keywords": ["threejs", "maps", "osm"]
+}
