@@ -11,6 +11,7 @@
 | Nº | Título | Descripción | Enlace |
 |:--:|:--------|:-------------|:--------|
 | 6 & 7 | **Transformaciones y Visualización 3D** | Sistema solar | [📘 Ver prácticas](./Practica6y7/README.md) |
+|8|**Visualización de datos**|Terremotos en EEUU|[📗 Ver prácticas](./practica8/README.md)
 
 ---
 
