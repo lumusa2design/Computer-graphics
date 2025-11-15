@@ -455,8 +455,70 @@ const label = new CSS2DObject(labelDiv);
 barra.add(label);
  ```
 
+### Animación de barras
 
- 
+Ventana temporal deslizante para la simulación:
+
+```js
+const ventanaMs = ventanaHoras * 3600 * 1000;
+```
+
+Filtrado para evitar incongruencias con el tiempo o si es muy ligero:
+```js
+if (!visibleTiempo || d.mag < umbralMag) { ... }
+```
+
+Altura según la magnitud con  *fade in*
+
+```js
+const baseHeight = 1;
+const extra = Math.max(0, mag - 2) * 4;
+d.targetHeight = baseHeight + extra;
+
+const speed = 0.8;
+d.currentHeight +=
+  (d.targetHeight - d.currentHeight) * Math.min(speed * delta, 1);
+```
+
+- `targetHeight` depende de la magnitud
+- `currentHeight` se interpola para que aparezca mas despacio
+
+Texto flotante:
+```js
+d.label.element.textContent = d.mag.toFixed(1);
+d.label.position.y = altura / 2 + 0.8;
+```
+Efecto pulsar:
+```js
+if (dtMs >= 0 && dtMs < 30 * 60 * 1000) {
+  const fase = (ahora / 1000) * 4.0;
+  const s = 1 + 0.2 * Math.sin(fase);
+  barra.scale.x = s;
+  barra.scale.z = s;
+} else {
+  barra.scale.x = 1;
+  barra.scale.z = 1;
+}
+```
+
+*Fade-in* y *Fade-out*
+
+```js
+let alpha = 1 - dtMs / ventanaMs;
+alpha = Math.max(0, Math.min(1, alpha));
+barra.material.opacity = alpha;
+d.label.element.style.opacity = alpha.toString();
+```
+
+Control de color según latitud
+```js
+let latNorm = (d.lat - minlat) / (maxlat - minlat);
+latNorm = Math.max(0, Math.min(1, latNorm));
+const hue = (1 - latNorm) * 0.66;
+const color = new THREE.Color().setHSL(hue, 1.0, 0.5);
+barra.material.color.copy(color);  
+```
+
 ## Videos de la práctica
 
 
