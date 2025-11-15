@@ -572,16 +572,10 @@ o puede intentar verlo aquí:
 
 --- 
 ## Recursos usados
-En general se ha usado la [API](https://threejs.org/docs/) de `three.js` dado que tiene muchos elementos explicados de forma exhaustiva de como usarse y la documentación introductoria del profesorado que mencionamos anteriormente. Algunos ejemplos relevantes de three.js son:
+En general se ha usado la [API](https://threejs.org/docs/) de `three.js` dado que tiene muchos elementos explicados de forma exhaustiva de como usarse y la documentación introductoria del profesorado que mencionamos anteriormente.
 
+Además se ha usado como base de datos la recogida en [USGS](https://earthquake.usgs.gov/earthquakes/feed/v1.0/csv.php)
 
+Destacar que aunque sea de three.js consulte [CSS2DRenderer](https://threejs.org/docs/#CSS2DRenderer) para las etiquetas 
 
-
-
-
-
-
-
-
-
-
+Uso de chatGPT para corrección de errores y búsqueda de herramientas.
