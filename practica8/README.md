@@ -534,11 +534,26 @@ labelRenderer.render(scene, camera);
 
 Uso de `delta` para que las animaciones sean independientes del FPS y se añade el render de las etiquetas
 
+## Resultado
 
+Como podemos ver en esta imagen:
+
+![result](result.png)
+
+hay una gran concentración al oeste de estados unidos de terremotos, al tratarse los datos solo de EEUU, podemos decir que si coincide en su mayoría de terremotos provocados en la falla, la cual es una zona con muchos seísmos
+
+![falla](falla.jpg)
 ## Videos de la práctica
 
+El video de la prática se encuentra en el propio github en result.mp4 además esta subido a Youtube:
 
+[video](https://youtu.be/uX6mr5ZKal0)
 
+o puede intentar verlo aquí:
+
+<video controls width="600">
+  <source src="./result.mp4" type="video/mp4">
+</video>
 
 ## Autores y Reconocimiento
 
