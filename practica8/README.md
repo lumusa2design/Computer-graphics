@@ -399,6 +399,28 @@ y se llama en el animate
 renderer.render(scene, camera);
 labelRenderer.render(scene, camera);
 ```
+
+### Camara y Controles
+
+Modifiqué la cámara para ajustarse al mapa de EEUU.
+```js
+camera.position.set(0, 20, 40);
+```
+
+Controles con autorotación y amortiguación
+
+```js
+camcontrols.autoRotate = true;
+camcontrols.autoRotateSpeed = 0.3;
+camcontrols.enableDamping = true;
+```
+
+### Adaptación de los datos
+ Cambie los CSV que habían por un único CSV que cambia el formato de separados por `;` a separado por `,` Además de que las columnas cambian así que ahora leerá las columnas de  `time, latitude, longitude, depth, mag, type, place.`.
+
+ Con la columna de `type` filtrará para que sea terremoto exclusivamente y no cuenta explosiones u otro tipo de interferencias.
+
+ 
 ## Videos de la práctica
 
 
