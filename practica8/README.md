@@ -519,6 +519,22 @@ const color = new THREE.Color().setHSL(hue, 1.0, 0.5);
 barra.material.color.copy(color);  
 ```
 
+### Bucle de animación principal
+
+```js
+const delta = clock.getDelta();
+if (texturacargada && fechaInicio) {
+  actualizarFecha();
+  actualizarBarras(delta);
+}
+camcontrols.update();
+renderer.render(scene, camera);
+labelRenderer.render(scene, camera);
+```
+
+Uso de `delta` para que las animaciones sean independientes del FPS y se añade el render de las etiquetas
+
+
 ## Videos de la práctica
 
 
