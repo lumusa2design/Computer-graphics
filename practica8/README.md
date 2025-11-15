@@ -420,6 +420,42 @@ camcontrols.enableDamping = true;
 
  Con la columna de `type` filtrará para que sea terremoto exclusivamente y no cuenta explosiones u otro tipo de interferencias.
 
+ ### Representación gráfica
+
+ Hemos dejado de usar puntos o esferas a usar cilindros para indicar el punto donde se encuentra, la altura del cilindro dependerá de la escala.
+
+ Para cada terremoto se crea un cilindro:
+
+ ```js
+ const baseGeo = new THREE.CylinderGeometry(0.3, 0.3, 1, 16);
+ ```
+
+ Con su respectivo material:
+
+ ```
+ new THREE.MeshPhongMaterial({
+  color: 0xffffff,
+  transparent: true,
+  opacity: 0.0,
+});
+ ```
+
+ y se guarda en user data:
+
+ ```js
+ { ...d, currentHeight: 0, targetHeight: 0, label: null }
+ ```
+
+ y se añade la label 2D para ver la magnitud con la escala de Richter:
+
+ ```js
+ const labelDiv = document.createElement("div");
+labelDiv.textContent = d.mag.toFixed(1);
+const label = new CSS2DObject(labelDiv);
+barra.add(label);
+ ```
+
+
  
 ## Videos de la práctica
 
