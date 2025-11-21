@@ -198,6 +198,13 @@ void main() {
     gl_FragColor = vec4(col, 1.0);
 }
 ```
+- `t`: Controla toda la animación.
+- `r`: Es la distancia respecto al centro.
+- `ang`: Es el ángulo del píxel 
+- `N`: Es el número de sectores.
+- `wedge`: Tamaño angular.
+- `p`: Es la seed del ruido fractal
+
 
 
 ### Shader short
@@ -213,12 +220,58 @@ void main(){
     gl_FragColor=vec4(c,1.);
 }
 ```
+desgranemos un poco este código:
+
+```glsl
+    vec2 u=(gl_FragCoord.xy-.5*u_resolution.xy)/u_resolution.y;
+```
+
+- traslada la pantalla para que el centro sea la coordenada (0,0)
+- escala `u_resolution.y` para mantender la proporción
+
+```glsl
+float r=length(u),a=atan(u.y,u.x),k=15.;
+```
+
+trabajamos con coordenadas polares:
+- `r`: distancia  respecto al centro.
+- `a`: ángulo
+- `k`: número de pétalos
+
+```glsl
+a=abs(mod(a,6.28318/k)-3.14159/k);
+```
+
+- Envuelve el angulo con una anchura $2\pi/k$
+- Centra el sector en 0
+- Usa valores absolutos.
+
+```glsl
+float v=sin(10.*r+4.*cos(8.*a+u_time))+.5*sin(3.*u_time+5.*r);
+```
+Crea un patrón oscilatorio con ondas dando la sensación de mandala que tiene.
+
+```glsl
+vec3 c=vec3(.905,.081,.107)+vec3(.85,.768,.059)*cos(v+vec3(0.,2.,4.));
+```
+genera la paleta de colores.
+
+```glsl
+c*=smoothstep(1.,.1,r);
+```
+Genera una viñeta radial
+
+```glsl
+gl_FragColor=vec4(c,1.);
+```
+
+renderiza
 
 ## Resultado
 
 El video del shader generativo se puede ver aquí:
 
-[video](https://youtu.be/uX6mr5ZKal0)
+[video](https://youtu.be/W3NwYJGskkE)
 
 o puede intentar verlo aquí:
 
@@ -230,7 +283,7 @@ Y si no, se encuentra en la carpeta *media* del *README* de la práctica 9.
 
 
 El video del shader generativo reducido sería el siguiente:
-[video](https://youtu.be/uX6mr5ZKal0)
+[video](https://youtu.be/DQUkxEr3-Bg)
 
 o puede intentar verlo aquí:
 
@@ -240,7 +293,7 @@ o puede intentar verlo aquí:
 
 
 Y la versión reducida sería la siguiente:
-[video](https://youtu.be/uX6mr5ZKal0)
+[video](https://youtu.be/qJV0AU4mPEA)
 
 o puede intentar verlo aquí:
 
