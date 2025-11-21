@@ -97,6 +97,75 @@ vec3 palette(float t) {
 }
 ```
 
+Genera la paleta de colores, usando tonos de colores rojos, amarillos, blancos y verdes.
+- Usa un coseno para generar un color suave en función del escalar `t`
+- `a, b, c, d`: controlan el offset y el color.
+
+```glsl
+vec2 rot(vec2 p,float a){
+    float s=sin(a), c=cos(a);
+    return mat2(c,-s,s,c)*p;
+}
+```
+Rotación del punto `p` con el  ángulo `a`.
+
+```glsl
+vec3 mandalaLayer(vec2 uv,float t,float petals,float radialScale,float hueShift,float ringFreq){
+    float PI = 3.14159265;
+    float r = length(uv);
+    float ang = atan(uv.y,uv.x);
+
+    float wedge = 2.0*PI/petals;
+    ang = abs(mod(ang,wedge)-0.5*wedge);
+
+    vec2 p = vec2(ang*radialScale, r*3.0);
+
+    float f1 = fbm(p+vec2(0.0,t));
+    float f2 = fbm(p*2.0-vec2(t*1.3,t*0.7));
+    vec2 pw = p + 0.94*vec2(f1,f2);
+    float f3 = fbm(pw+vec2(t*0.8,-t*0.6));
+
+    float mask = smoothstep(-0.18,0.9,f1+f2-r*1.85);
+
+    float rings = sin(ringFreq*r + f3*6.0);
+    float pattern = mix(f3,rings,0.6);
+    pattern = 0.5 + 0.5*pattern;
+
+    float hue = pattern + 1.3*r + 0.06*f2 + hueShift;
+
+    vec3 colR = palette(hue+0.015);
+    vec3 colG = palette(hue);
+    vec3 colB = palette(hue-0.015);
+    vec3 col = vec3(colR.r,colG.g,colB.b);
+    col *= 0.3 + 1.6*mask;
+    float edge = smoothstep(0.4,0.0,abs(rings))*mask;
+    col += vec3(0.7,0.8,1.0)*edge*0.25; 
+    float eps = 0.01;
+    float h0 = f3;
+    float hx = fbm(pw+vec2(eps,0.0)+vec2(t*0.8,-t*0.6));
+    float hy = fbm(pw+vec2(0.0,eps)+vec2(t*0.8,-t*0.6));
+    vec3 n = normalize(vec3(hx-h0,hy-h0,0.5));
+
+    float lightAng = u_time*0.35;
+    vec3 lightDir = normalize(vec3(cos(lightAng),sin(lightAng),0.7));
+
+    float diff = clamp(dot(n,lightDir),0.0,1.0);
+    float spec = pow(max(dot(reflect(-lightDir,n),vec3(0,0,1)),0.0),10.0);
+
+    col *= 0.55 + 0.7*diff;        
+    col += vec3(1.2,1.1,1.3)*spec*0.25; 
+
+    return col;
+}
+```
+
+- `uv`: coordenadas espaciales ya transformadas.
+- `t`: tiempo.
+- `petals`: número de pétalos.
+- `radialScale`: escala en el eje radial.
+- `hueShift`: desplazamiento en la paleta de color.
+- `ringFreq`: frecuencia de los anillos radiales.
+
 
 ```glsl
 void main() {
