@@ -318,10 +318,14 @@ o puede intentar verlo aquí:
 
 --- 
 ## Recursos usados
-En general se ha usado la [API](https://threejs.org/docs/) de `three.js` dado que tiene muchos elementos explicados de forma exhaustiva de como usarse y la documentación introductoria del profesorado que mencionamos anteriormente.
+Para estos ejercicios he usado de referencia los apuntes del profesor. Y además los siguientes materiales complementarios:
+- [*The Book of Shaders*](https://thebookofshaders.com/?lan=es): Para entender mejor el funcionamiento del lenguaje `GLSL`, las funciones de ruido, la interpolación de Hermite, domain warping, las paletas de colores, y para referencias de patrones generativos.
 
-Además se ha usado como base de datos la recogida en [USGS](https://earthquake.usgs.gov/earthquakes/feed/v1.0/csv.php)
+- [iquilez](https://www.shadertoy.com/view/MtcSz4) para referencias de mandala, uso de Brownian motion, colores.
 
-Destacar que aunque sea de three.js consulte [CSS2DRenderer](https://threejs.org/docs/#CSS2DRenderer) para las etiquetas 
+- [paletton](https://paletton.com/): Como guía para la selección de colores.
+- Chatgpt como guía tutor que me recomendaba técnicas y ajustaba al contenido de acuerdo a mis necesidades. Además de corrección de errores.
 
-Uso de chatGPT para corrección de errores y búsqueda de herramientas.
+
+
+
