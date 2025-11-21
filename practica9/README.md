@@ -39,7 +39,9 @@ float hash(vec2 p) {
 }
 ```
 
-Esta función es la encargada de generar el ruido , que se generará gracias al angulo de la capa creada. Usando 
+Esta función es la encargada de generar el ruido , que se generará gracias al angulo de la capa creada. Usando convirtiendo el `vec2` en un valor pseudoaleatrio.
+
+
 
 
 ```glsl
@@ -60,7 +62,11 @@ float noise(vec2 p) {
 }
 ```
 
-Se generará el ruido gracias a la función hash explicada anteriormente
+Se generará el ruido 3D gracias a la función hash explicada anteriormente. Los valores que la componen son:
+- `i`: celda entera
+- `f`: parte fraccionaria
+- `a`, `b`, `c`, `d`: valores aleatorios en las 4 esquinas.
+- `u`: interpolador basado en Hermite (para evitar cambios bruscos y aliasing) 
 
 ```glsl
 float fbm(vec2 p) {
@@ -75,6 +81,11 @@ float fbm(vec2 p) {
     return v;
 }
 ```
+Viene de [Fractal Brownian Motion](https://thebookofshaders.com/13/):
+- Suma varias octavas sobre el ruido cada vez:
+    - Escala `p` con matriz `M` (donde rota o escala en el espacio).
+    - reduce la amplitud de `a`
+- Devuelve el ruido con mayor variedad 
 
 ```glsl
 vec3 palette(float t) {
@@ -136,23 +147,36 @@ void main(){
 
 ## Resultado
 
-Como podemos ver en esta imagen:
-
-![result](result.png)
-
-hay una gran concentración al oeste de estados unidos de terremotos, al tratarse los datos solo de EEUU, podemos decir que si coincide en su mayoría de terremotos provocados en la falla, la cual es una zona con muchos seísmos
-
-![falla](falla.jpg)
-## Videos de la práctica
-
-El video de la prática se encuentra en el propio github en result.mp4 además esta subido a Youtube:
+El video del shader generativo se puede ver aquí:
 
 [video](https://youtu.be/uX6mr5ZKal0)
 
 o puede intentar verlo aquí:
 
 <video controls width="600">
-  <source src="./result.mp4" type="video/mp4">
+  <source src="./media/generative_shader.webm" type="video/webm">
+</video>
+
+Y si no, se encuentra en la carpeta *media* del *README* de la práctica 9.
+
+
+El video del shader generativo reducido sería el siguiente:
+[video](https://youtu.be/uX6mr5ZKal0)
+
+o puede intentar verlo aquí:
+
+<video controls width="600">
+  <source src="./media/tiny_generative_shader.webm" type="video/webm">
+</video>
+
+
+Y la versión reducida sería la siguiente:
+[video](https://youtu.be/uX6mr5ZKal0)
+
+o puede intentar verlo aquí:
+
+<video controls width="600">
+  <source src="./media/short_shader.webm" type="video/webm">
 </video>
 
 ## Autores y Reconocimiento
