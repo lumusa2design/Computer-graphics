@@ -1,0 +1,20 @@
+{
+  "name": "threejs-ig-eii",
+  "version": "1.0.0",
+  "description": "IG-EII",
+  "main": "index.html",
+  "scripts": {
+    "start": "parcel ./src/index.html --open",
+    "build": "parcel build ./src/index.html"
+  },
+  "dependencies": {
+    "ammojs-typed": "1.0.2",
+    "lil-gui": "^0.19.0",
+    "@tweenjs/tween.js": "18.6.4",
+    "three": "0.152.1"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.6.1"
+  },
+  "keywords": ["threejs", "tween.js", "example"]
+}
