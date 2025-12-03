@@ -2421,8 +2421,63 @@ function playReplay() {
 }
 ```
 
+
 El código desarrollado se encuentra en *script_45_ammo.js*.
 
+### Añadidos gráficos
+
+Configuré un entorno más *cartoon* con niebla y mapas de tonos.
+
+```js
+scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87b5ff);
+scene.fog = new THREE.Fog(0x87b5ff, 40, 140);
+
+renderer = new THREE.WebGLRenderer();
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+```
+
+A su vez añadí una cámara con un movimiento suavizado y con desplazamiento con reseteado.
+
+```js
+controls = new OrbitControls(camera, renderer.domElement);
+controls.enablePan = false;
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.rotateSpeed = 0.9;
+controls.zoomSpeed = 1.0;
+controls.minDistance = 10;
+controls.maxDistance = 60;
+```
+Esta es la función que reseteará la cámara cuando siga al pájaro:
+
+```js
+const cameraBasePosition = new THREE.Vector3();
+const cameraBaseTarget = new THREE.Vector3();
+
+cameraBasePosition.set(-14, 7, 14);
+cameraBaseTarget.set(12, 5, 0);
+camera.position.copy(cameraBasePosition);
+controls.target.copy(cameraBaseTarget);
+
+function resetCameraToBase(immediate) {
+  if (!camera || !controls) return;
+  if (immediate) {
+    camera.position.copy(cameraBasePosition);
+    controls.target.copy(cameraBaseTarget);
+    controls.update();
+  } else {
+    camera.position.lerp(cameraBasePosition, 0.2);
+    controls.target.lerp(cameraBaseTarget, 0.2);
+    controls.update();
+  }
+}
+```
 
 ## Resultado
 
