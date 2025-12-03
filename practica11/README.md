@@ -18,7 +18,10 @@
 
 --- 
 ## Prácticas 11: Física y  Animación
-Lorem Ipsum
+
+La tarea consiste en proponer un prototipo en *three.js* que integre o bien la librería *tween.js* y/o *ammo.js*. La entrega final que he hecho ha sido en *tween* y *ammo*.
+
+
 
 ## Resultado
 
