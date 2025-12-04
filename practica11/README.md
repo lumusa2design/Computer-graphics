@@ -3147,6 +3147,76 @@ function updateBirdTrails() {
 }
 ```
 
+### Puntuación y victoria/derrota
+
+Así se gestionan los puntos y los combos a la hora de matar los cerdos (bolas verde fosforito).
+```js
+let worldTime = 0;
+let comboMultiplier = 1;
+let lastPigKillTime = 0;
+const basePigScore = 100;
+const birdBonusPerRemaining = 50;
+
+function registerPigKill() {
+  const now = worldTime;
+  if (now - lastPigKillTime < 1.0) {
+    comboMultiplier = Math.min(comboMultiplier + 1, 5);
+  } else {
+    comboMultiplier = 1;
+  }
+  lastPigKillTime = now;
+
+  const gain = basePigScore * comboMultiplier;
+  score += gain;
+  updateScore();
+  updateComboHUD();
+}
+```
+
+Comprobación de nivel cuando un cerdo muere:
+
+```js
+let pigsAlive = 0;
+let pendingLoseCheck = false;
+
+function killPigObject(obj, withFX) {
+  if (!obj || obj.userData.removedPig) return;
+  obj.userData.removedPig = true;
+
+  if (withFX) {
+    createExplosionEffect(obj.position.clone(), 0x66cc33);
+    triggerImpactFX(0.45);
+  }
+
+  const body = obj.userData.physicsBody;
+  if (body) {
+    physicsWorld.removeRigidBody(body);
+  }
+  scene.remove(obj);
+
+  for (let i = rigidBodies.length - 1; i >= 0; i--) {
+    if (rigidBodies[i] === obj) {
+      rigidBodies.splice(i, 1);
+    }
+  }
+
+  pigsAlive -= 1;
+  if (pigsAlive < 0) pigsAlive = 0;
+  updatePigsUI();
+  registerPigKill();
+
+  if (pigsAlive === 0 && gameState.state === "playing") {
+    const bonus = gameState.birdsLeft * birdBonusPerRemaining;
+    if (bonus > 0) {
+      score += bonus;
+      updateScore();
+    }
+    gameState.state = "win";
+    pendingLoseCheck = false;
+    showEndOverlay("win", bonus);
+  }
+}
+```
 
 
 ## Resultado
