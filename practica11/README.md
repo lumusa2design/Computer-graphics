@@ -2588,7 +2588,234 @@ function updateAimFromMouse() {
 ```
 Y con este fragmento de código, se hace el apuntado con el ratón.
 
-    
+### HUD e Interfaz
+Esta es la inicialización del HUD:
+```js
+scoreElement = document.createElement("div");
+  scoreElement.style.position = "fixed";
+  scoreElement.style.top = "10px";
+  scoreElement.style.left = "10px";
+  scoreElement.style.padding = "8px 12px";
+  scoreElement.style.background = "rgba(0,0,0,0.5)";
+  scoreElement.style.color = "#fff";
+  scoreElement.style.fontFamily = "sans-serif";
+  scoreElement.style.fontSize = "14px";
+  scoreElement.style.zIndex = "100";
+  document.body.appendChild(scoreElement);
+  updateScore();
+
+  birdIndicatorElement = document.createElement("div");
+  birdIndicatorElement.style.position = "fixed";
+  birdIndicatorElement.style.top = "40px";
+  birdIndicatorElement.style.left = "10px";
+  birdIndicatorElement.style.padding = "6px 10px";
+  birdIndicatorElement.style.background = "rgba(0,0,0,0.5)";
+  birdIndicatorElement.style.color = "#fff";
+  birdIndicatorElement.style.fontFamily = "sans-serif";
+  birdIndicatorElement.style.fontSize = "13px";
+  birdIndicatorElement.style.zIndex = "100";
+  document.body.appendChild(birdIndicatorElement);
+  updateBirdIndicator();
+
+  birdsLeftElement = document.createElement("div");
+  birdsLeftElement.style.position = "fixed";
+  birdsLeftElement.style.top = "70px";
+  birdsLeftElement.style.left = "10px";
+  birdsLeftElement.style.padding = "6px 10px";
+  birdsLeftElement.style.background = "rgba(0,0,0,0.5)";
+  birdsLeftElement.style.color = "#fff";
+  birdsLeftElement.style.fontFamily = "sans-serif";
+  birdsLeftElement.style.fontSize = "13px";
+  birdsLeftElement.style.zIndex = "100";
+  document.body.appendChild(birdsLeftElement);
+
+  levelElement = document.createElement("div");
+  levelElement.style.position = "fixed";
+  levelElement.style.top = "100px";
+  levelElement.style.left = "10px";
+  levelElement.style.padding = "6px 10px";
+  levelElement.style.background = "rgba(0,0,0,0.5)";
+  levelElement.style.color = "#fff";
+  levelElement.style.fontFamily = "sans-serif";
+  levelElement.style.fontSize = "13px";
+  levelElement.style.zIndex = "100";
+  document.body.appendChild(levelElement);
+
+  pigsElement = document.createElement("div");
+  pigsElement.style.position = "fixed";
+  pigsElement.style.top = "130px";
+  pigsElement.style.left = "10px";
+  pigsElement.style.padding = "6px 10px";
+  pigsElement.style.background = "rgba(0,0,0,0.5)";
+  pigsElement.style.color = "#fff";
+  pigsElement.style.fontFamily = "sans-serif";
+  pigsElement.style.fontSize = "13px";
+  pigsElement.style.zIndex = "100";
+  document.body.appendChild(pigsElement);
+  updatePigsUI();
+
+  comboElement = document.createElement("div");
+  comboElement.style.position = "fixed";
+  comboElement.style.top = "160px";
+  comboElement.style.left = "10px";
+  comboElement.style.padding = "6px 10px";
+  comboElement.style.background = "rgba(0,0,0,0.5)";
+  comboElement.style.color = "#ffdd33";
+  comboElement.style.fontFamily = "sans-serif";
+  comboElement.style.fontSize = "13px";
+  comboElement.style.zIndex = "100";
+  comboElement.style.display = "none";
+  document.body.appendChild(comboElement);
+
+  abilityElement = document.createElement("div");
+  abilityElement.style.position = "fixed";
+  abilityElement.style.top = "190px";
+  abilityElement.style.left = "10px";
+  abilityElement.style.padding = "6px 10px";
+  abilityElement.style.background = "rgba(0,0,0,0.5)";
+  abilityElement.style.color = "#66ffcc";
+  abilityElement.style.fontFamily = "sans-serif";
+  abilityElement.style.fontSize = "13px";
+  abilityElement.style.zIndex = "100";
+  document.body.appendChild(abilityElement);
+  updateAbilityHUD("Sin habilidad activa");
+
+  endOverlay = document.createElement("div");
+  endOverlay.style.position = "fixed";
+  endOverlay.style.top = "0";
+  endOverlay.style.left = "0";
+  endOverlay.style.width = "100%";
+  endOverlay.style.height = "100%";
+  endOverlay.style.display = "none";
+  endOverlay.style.alignItems = "center";
+  endOverlay.style.justifyContent = "center";
+  endOverlay.style.background = "rgba(0,0,0,0.5)";
+  endOverlay.style.zIndex = "200";
+
+  const panel = document.createElement("div");
+  panel.style.background = "#222";
+  panel.style.color = "#fff";
+  panel.style.padding = "20px 30px";
+  panel.style.borderRadius = "8px";
+  panel.style.fontFamily = "sans-serif";
+  panel.style.textAlign = "center";
+  panel.style.minWidth = "260px";
+
+  overlayText = document.createElement("div");
+  overlayText.style.marginBottom = "15px";
+  overlayText.style.fontSize = "18px";
+  panel.appendChild(overlayText);
+
+  const buttonsRow = document.createElement("div");
+  buttonsRow.style.display = "flex";
+  buttonsRow.style.justifyContent = "center";
+  buttonsRow.style.gap = "10px";
+
+  const retryButton = document.createElement("button");
+  retryButton.textContent = "Reintentar nivel";
+  retryButton.style.padding = "6px 10px";
+  retryButton.style.cursor = "pointer";
+  retryButton.onclick = () => {
+    resetLevel();
+  };
+
+  overlayNextButton = document.createElement("button");
+  overlayNextButton.textContent = "Siguiente nivel";
+  overlayNextButton.style.padding = "6px 10px";
+  overlayNextButton.style.cursor = "pointer";
+  overlayNextButton.onclick = () => {
+    nextLevel();
+  };
+
+  overlayReplayButton = document.createElement("button");
+  overlayReplayButton.textContent = "Replay disparo";
+  overlayReplayButton.style.padding = "6px 10px";
+  overlayReplayButton.style.cursor = "pointer";
+  overlayReplayButton.onclick = () => {
+    playReplay();
+  };
+
+  buttonsRow.appendChild(retryButton);
+  buttonsRow.appendChild(overlayNextButton);
+  buttonsRow.appendChild(overlayReplayButton);
+  panel.appendChild(buttonsRow);
+  endOverlay.appendChild(panel);
+  document.body.appendChild(endOverlay);
+
+  updateHudBird();
+  updateBirdsLeftUI();
+  updateLevelUI();
+```
+
+Si nos fijamos la final llamamos a 4 funciones que actualizan el HUD.
+
+
+```js
+function updateScore() {
+  if (scoreElement) {
+    scoreElement.textContent = "Puntos: " + score;
+  }
+}
+
+function getBirdLabel(type) {
+  if (type === 2) return "2: Rápido rebotador";
+  if (type === 3) return "3: Explosivo";
+  if (type === 4) return "4: Doble";
+  if (type === 5) return "5: Boomerang";
+  return "1: Básico";
+}
+
+function updateBirdIndicator() {
+  if (!birdIndicatorElement) return;
+  const label = getBirdLabel(currentBirdType);
+  birdIndicatorElement.textContent = "Pájaro actual: " + label;
+}
+
+function updateComboHUD() {
+  if (!comboElement) return;
+  if (comboMultiplier > 1) {
+    comboElement.style.display = "block";
+    comboElement.textContent = "Combo x" + comboMultiplier;
+  } else {
+    comboElement.style.display = "none";
+  }
+}
+
+function updateAbilityHUD(text) {
+  if (!abilityElement) return;
+  abilityElement.textContent = text;
+}
+```
+- `updateScore`: Actualiza la puntuación del jugador.
+- `getBirdLabel`:Mediante el número que se le pasa detecta que pájaro es el cargado en escena.
+- `updateBirdIndicatorr`: Indica el pájaro actual.
+- `updateComboHUD`: Actualiza la puntuación con el comobo actual.
+- `updateAbilityHUD`: Indica si la habilidad esta disponible
+
+
+```js
+let hudBird = null;
+
+function updateHudBird() {
+  if (hudBird) {
+    camera.remove(hudBird);
+    hudBird = null;
+  }
+  const params = getBirdParams(currentBirdType);
+  hudBird = createBirdMesh(params.radius * 0.6, params.color, params.type);
+  hudBird.traverse((o) => {
+    if (o.isMesh) {
+      o.castShadow = false;
+      o.receiveShadow = false;
+    }
+  });
+  hudBird.position.set(-3, -2, -8);
+  camera.add(hudBird);
+}
+```
+
+Coloca un pájaro indicativo de que pájaro es el actual de forma visual.
+
 
 ## Resultado
 
