@@ -2816,6 +2816,95 @@ function updateHudBird() {
 
 Coloca un pájaro indicativo de que pájaro es el actual de forma visual.
 
+### Materiales
+
+Defino que materiales afectan a su masa, fricción que le afecta y restitución,
+
+```js
+const MATERIAL_TYPES = {
+  wood: {
+    densityScale: 0.8,
+    friction: 0.6,
+    restitution: 0.3,
+  },
+  stone: {
+    densityScale: 1.4,
+    friction: 0.9,
+    restitution: 0.1,
+  },
+  glass: {
+    densityScale: 0.5,
+    friction: 0.4,
+    restitution: 0.05,
+  },
+  metal: {
+    densityScale: 1.8,
+    friction: 0.4,
+    restitution: 0.2,
+  },
+};
+```
+Y lo llamo en la función `createBoxWithPhysics`.
+
+```js
+function createBoxWithPhysics(
+  sx, sy, sz,
+  mass,
+  pos, quat,
+  material,
+  track = true,
+  materialType = null
+) {
+  const object = new THREE.Mesh(
+    new THREE.BoxGeometry(sx, sy, sz, 1, 1, 1),
+    material
+  );
+  const shape = new Ammo.btBoxShape(
+    new Ammo.btVector3(sx * 0.5, sy * 0.5, sz * 0.5)
+  );
+  shape.setMargin(margin);
+
+  let finalMass = mass;
+  let matDef = null;
+  if (materialType && mass > 0) {
+    matDef = MATERIAL_TYPES[materialType] || null;
+    if (matDef && typeof matDef.densityScale === "number") {
+      finalMass = mass * matDef.densityScale;
+    }
+  }
+
+  object.userData.materialType = materialType || null;
+
+  if (object.material && object.material.isMeshStandardMaterial) {
+    if (materialType === "wood") {
+      object.material.roughness = 0.85;
+      object.material.metalness = 0.05;
+    } else if (materialType === "stone") {
+      object.material.roughness = 0.95;
+      object.material.metalness = 0.0;
+    } else if (materialType === "metal") {
+      object.material.roughness = 0.35;
+      object.material.metalness = 0.9;
+    }
+  }
+
+  const body = createRigidBody(object, shape, finalMass, pos, quat);
+
+  if (matDef) {
+    if (typeof matDef.friction === "number") body.setFriction(matDef.friction);
+    if (typeof matDef.restitution === "number")
+      body.setRestitution(matDef.restitution);
+  }
+
+  if (track) {
+    levelObjects.push(object);
+  }
+
+  return object;
+}
+```
+
+
 
 ## Resultado
 
