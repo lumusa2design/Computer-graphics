@@ -2479,6 +2479,117 @@ function resetCameraToBase(immediate) {
 }
 ```
 
+### Tirachinas y apuntado
+
+Para ello puse dos elementos gráficos que sirven como forma visual del tirachinas y se simula una goma que se estira y carga un disparo.
+
+```js
+const slingshotAnchor = new THREE.Vector3(-8, 3, 0);
+let slingshotGroup = null;
+let slingshotBand = null;
+let slingshotForkLeft = null;
+let slingshotForkRight = null;
+```
+Con esto incializamos las variables necesarias para crear el  tirachinas.
+```js
+function createSlingshot() {
+  slingshotGroup = new THREE.Group();
+  slingshotGroup.position.copy(slingshotAnchor);
+
+  const baseGeom = new THREE.BoxGeometry(1.2, 0.3, 1.2);
+  const baseMat = new THREE.MeshStandardMaterial({
+    color: 0x8b5a2b,
+    roughness: 0.8,
+    metalness: 0.05,
+  });
+  const base = new THREE.Mesh(baseGeom, baseMat);
+  base.position.set(0, -0.15, 0);
+  slingshotGroup.add(base);
+
+  const pillarGeom = new THREE.CylinderGeometry(0.2, 0.25, 2, 12);
+  const pillarMat = new THREE.MeshStandardMaterial({
+    color: 0x8b5a2b,
+    roughness: 0.8,
+    metalness: 0.05,
+  });
+
+  const left = new THREE.Mesh(pillarGeom, pillarMat);
+  left.position.set(-0.4, 1, 0);
+  const right = new THREE.Mesh(pillarGeom, pillarMat);
+  right.position.set(0.4, 1, 0);
+  slingshotGroup.add(left);
+  slingshotGroup.add(right);
+
+  slingshotForkLeft = new THREE.Vector3(-0.4, 2, 0);
+  slingshotForkRight = new THREE.Vector3(0.4, 2, 0);
+
+  const bandGeom = new THREE.BufferGeometry();
+  const bandPositions = new Float32Array(3 * 3);
+  bandGeom.setAttribute("position", new THREE.BufferAttribute(bandPositions, 3));
+  const bandMat = new THREE.LineBasicMaterial({ color: 0x442200 });
+  slingshotBand = new THREE.Line(bandGeom, bandMat);
+  slingshotGroup.add(slingshotBand);
+
+  scene.add(slingshotGroup);
+  updateSlingshotBand(false);
+}
+```
+Con esto tenemos inicializado y creado el tirachinas
+
+```js
+let isCharging = false;
+let chargeStart = 0;
+const aimOrigin = new THREE.Vector3();
+const aimDirection = new THREE.Vector3();
+
+function getChargeFactor() {
+  if (!isCharging) return 1;
+  const now = performance.now();
+  const t = (now - chargeStart) / 1000;
+  const maxExtra = 1.6;
+  return 0.4 + Math.min(t, maxExtra);
+}
+
+function updateSlingshotBand(stretched) {
+  if (!slingshotBand) return;
+  const positions = slingshotBand.geometry.attributes.position.array;
+  const leftWorld = slingshotForkLeft.clone().applyMatrix4(slingshotGroup.matrixWorld);
+  const rightWorld = slingshotForkRight.clone().applyMatrix4(slingshotGroup.matrixWorld);
+  let pocket;
+  if (stretched && isCharging) {
+    const charge = Math.min(getChargeFactor(), 2.0);
+    const stretchLen = 1 + charge * 1.5;
+    pocket = slingshotAnchor.clone().sub(aimDirection.clone().multiplyScalar(stretchLen));
+  } else {
+    pocket = leftWorld.clone().add(rightWorld).multiplyScalar(0.5);
+  }
+  positions[0] = leftWorld.x;  positions[1] = leftWorld.y;  positions[2] = leftWorld.z;
+  positions[3] = pocket.x;     positions[4] = pocket.y;     positions[5] = pocket.z;
+  positions[6] = rightWorld.x; positions[7] = rightWorld.y; positions[8] = rightWorld.z;
+  slingshotBand.geometry.attributes.position.needsUpdate = true;
+}
+```
+Con esto se carga el tirachinas.
+
+```js
+const aimPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -slingshotAnchor.y);
+const mouseCoords = new THREE.Vector2();
+const raycaster = new THREE.Raycaster();
+
+function updateAimFromMouse() {
+  raycaster.setFromCamera(mouseCoords, camera);
+  const intersection = new THREE.Vector3();
+  raycaster.ray.intersectPlane(aimPlane, intersection);
+  if (intersection) {
+    aimOrigin.copy(slingshotAnchor);
+    aimDirection.copy(intersection.sub(slingshotAnchor).normalize());
+  }
+}
+```
+Y con este fragmento de código, se hace el apuntado con el ratón.
+
+    
+
 ## Resultado
 
 El video del juego  se puede ver aquí:
