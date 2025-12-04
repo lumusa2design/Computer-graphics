@@ -2904,6 +2904,116 @@ function createBoxWithPhysics(
 }
 ```
 
+### Tipos de pájaro 
+
+Defino los parámetros según el tipo de pájaro:
+```js
+function getBirdParams(type) {
+  const baseSpeed = 30;
+  const baseMass = 40;
+  if (type === 2) {
+    return {
+      type,
+      radius: 0.9,
+      mass: baseMass,
+      speed: baseSpeed * 5,
+      restitution: 0.95,
+      color: 0x00aaff,
+    };
+  } else if (type === 3) {
+    return {
+      type,
+      radius: 1.0,
+      mass: baseMass * 1.2,
+      speed: baseSpeed * 1.1,
+      restitution: 0.3,
+      color: 0xffaa00,
+    };
+  } else if (type === 4) {
+    return {
+      type,
+      radius: 0.85,
+      mass: baseMass,
+      speed: baseSpeed * 1.2,
+      restitution: 0.4,
+      color: 0xaa00ff,
+    };
+  } else if (type === 5) {
+    return {
+      type,
+      radius: 0.95,
+      mass: baseMass,
+      speed: baseSpeed * 3.1,
+      restitution: 0.4,
+      color: 0x00ff88,
+    };
+  }
+  return {
+    type: 1,
+    radius: 0.9,
+    mass: baseMass,
+    speed: baseSpeed,
+    restitution: 0.4,
+    color: 0xff0000,
+  };
+}
+```
+
+Defino los controles para la selección del pájaro.
+
+```js
+let currentBirdType = 1;
+
+window.addEventListener("keydown", (event) => {
+  if (event.key >= "1" && event.key <= "5") {
+    currentBirdType = parseInt(event.key, 10);
+    updateBirdIndicator();
+    updateHudBird();
+  }
+  if (event.code === "Space") {
+    activateBirdAbility();
+  }
+});
+```
+
+Activación de habilidades:
+
+```js
+function activateBirdAbility() {
+  if (!activeBird || !activeBirdBody) return;
+  if (activeBird.userData.abilityUsed) return;
+  const type = activeBird.userData.birdType || 1;
+  if (type === 2) {
+    const v = activeBirdBody.getLinearVelocity();
+    const vx = v.x();
+    const vy = v.y();
+    const vz = v.z();
+    const speed = Math.sqrt(vx * vx + vy * vy + vz * vz) || 1;
+    const factor = 1.8;
+    const newV = new Ammo.btVector3(
+      (vx / speed) * speed * factor,
+      (vy / speed) * speed * factor,
+      (vz / speed) * speed * factor
+    );
+    activeBirdBody.setLinearVelocity(newV);
+    Ammo.destroy(newV);
+    triggerImpactFX(0.3);
+  } else if (type === 3) {
+    explodeBird(activeBirdBody);
+  } else if (type === 4) {
+    duplicateBird(activeBirdBody);
+  } else if (type === 5) {
+    const v = activeBirdBody.getLinearVelocity();
+    const inv = new Ammo.btVector3(-v.x(), -v.y(), -v.z());
+    activeBirdBody.setLinearVelocity(inv);
+    Ammo.destroy(inv);
+    triggerImpactFX(0.3);
+  }
+  activeBird.userData.abilityUsed = true;
+  updateAbilityHUD("Habilidad usada");
+}
+```
+
 
 
 ## Resultado
