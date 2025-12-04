@@ -3014,6 +3014,139 @@ function activateBirdAbility() {
 }
 ```
 
+### Trayectoria de disparo
+
+Previsualización de trayectoria con gravedad.
+
+```js
+function ensureAimPreview() {
+  if (!aimPreviewLine) {
+    const steps = 40;
+    const positions = new Float32Array(steps * 3);
+    const colors = new Float32Array(steps * 3);
+    for (let i = 0; i < steps; i++) {
+      const t = i / (steps - 1);
+      const r = 1.0;
+      const g = 0;
+      const b = 0;
+      const i3 = 3 * i;
+      colors[i3] = r;
+      colors[i3 + 1] = g;
+      colors[i3 + 2] = b;
+    }
+    const geom = new THREE.BufferGeometry();
+    geom.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    geom.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+    const mat = new THREE.LineBasicMaterial({
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.9,
+      linewidth: 12,
+    });
+    aimPreviewLine = new THREE.Line(geom, mat);
+    scene.add(aimPreviewLine);
+  }
+  if (!aimImpactMarker) {
+    const geom = new THREE.SphereGeometry(0.3, 16, 16);
+    const mat = new THREE.MeshStandardMaterial({
+      color: 0xffaa33,
+      emissive: 0xffaa33,
+      emissiveIntensity: 2.5,
+      roughness: 0.3,
+      metalness: 0.0,
+      transparent: true,
+      opacity: 1.0,
+    });
+    aimImpactMarker = new THREE.Mesh(geom, mat);
+    scene.add(aimImpactMarker);
+  }
+}
+
+function updateAimPreview(origin, dir, speed) {
+  ensureAimPreview();
+  const positionsAttr = aimPreviewLine.geometry.getAttribute("position");
+  const positions = positionsAttr.array;
+  const steps = positionsAttr.count;
+  const g = new THREE.Vector3(0, -gravityConstant, 0);
+  let p = origin.clone();
+  let v = dir.clone().multiplyScalar(speed);
+  let lastValid = p.clone();
+  let stepCount = steps;
+  const dt = 0.08;
+
+  for (let i = 0; i < steps; i++) {
+    const i3 = 3 * i;
+    positions[i3] = p.x;
+    positions[i3 + 1] = p.y;
+    positions[i3 + 2] = p.z;
+    lastValid.copy(p);
+    v.addScaledVector(g, dt);
+    p.addScaledVector(v, dt);
+    if (p.y <= 0.5) {
+      stepCount = i + 1;
+      break;
+    }
+  }
+
+  for (let i = stepCount; i < steps; i++) {
+    const i3 = 3 * i;
+    positions[i3] = lastValid.x;
+    positions[i3 + 1] = lastValid.y;
+    positions[i3 + 2] = lastValid.z;
+  }
+
+  positionsAttr.needsUpdate = true;
+  aimPreviewLine.visible = true;
+
+  if (aimImpactMarker) {
+    aimImpactMarker.visible = true;
+    aimImpactMarker.position.copy(lastValid);
+    aimImpactMarker.scale.setScalar(1 + Math.random() * 0.2);
+  }
+}
+```
+
+Estela de los pájaros:
+```js
+const trailParticles = [];
+const TRAIL_LIFE = 0.8;
+const TRAIL_MIN_DIST = 0.4;
+
+function createTrailParticle(position, color) {
+  const geom = new THREE.SphereGeometry(0.18, 12, 12);
+  const mat = new THREE.MeshStandardMaterial({
+    color,
+    emissive: color,
+    emissiveIntensity: 2.5,
+    roughness: 0.2,
+    metalness: 0.0,
+    transparent: true,
+    opacity: 1.0,
+  });
+  const mesh = new THREE.Mesh(geom, mat);
+  mesh.position.copy(position);
+  scene.add(mesh);
+  trailParticles.push({ mesh, life: TRAIL_LIFE });
+}
+
+function updateBirdTrails() {
+  for (let i = 0; i < rigidBodies.length; i++) {
+    const obj = rigidBodies[i];
+    if (!obj.userData.isBird) continue;
+    const last = obj.userData.lastTrailPos;
+    if (!last) {
+      obj.userData.lastTrailPos = obj.position.clone();
+      continue;
+    }
+    if (last.distanceToSquared(obj.position) >= TRAIL_MIN_DIST * TRAIL_MIN_DIST) {
+      const c = obj.userData.trailColor || 0xffaa33;
+      createTrailParticle(obj.position, c);
+      obj.userData.lastTrailPos.copy(obj.position);
+    }
+  }
+}
+```
+
 
 
 ## Resultado
