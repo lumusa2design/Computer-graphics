@@ -3250,11 +3250,11 @@ Y si no, se encuentra en la carpeta *media* del *README* de la práctica 10 .
 --- 
 ## Recursos usados
 Para estos ejercicios he usado de referencia los apuntes del profesor. Y además los siguientes materiales complementarios:
-- [*The Book of Shaders*](https://thebookofshaders.com/?lan=es): Para entender mejor el funcionamiento del lenguaje `GLSL`, las funciones de ruido, la interpolación de Hermite, domain warping, las paletas de colores, y para referencias de patrones generativos.
 
-- [iquilez](https://www.shadertoy.com/view/MtcSz4) para referencias de mandala, uso de Brownian motion, colores.
+- [Documentación de Three.js](https://threejs.org/docs/)
+- [Documentación de ammo.js](https://github.com/kripken/ammo.js/) basado en [Bullet](https://pybullet.org/Bullet/BulletFull/).
+- [Documentacion de tween.js](https://github.com/tweenjs/tween.js/tree/main/docs)
 
-- [paletton](https://paletton.com/): Como guía para la selección de colores.
 - Chatgpt como guía tutor que me recomendaba técnicas y ajustaba al contenido de acuerdo a mis necesidades. Además de corrección de errores.
 
 
