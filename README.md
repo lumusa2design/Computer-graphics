@@ -12,7 +12,8 @@
 |:--:|:--------|:-------------|:--------|
 | 6 & 7 | **Transformaciones y Visualización 3D** | Sistema solar | [📘 Ver prácticas](./Practica6y7/README.md) |
 |8|**Visualización de datos**|Terremotos en EEUU|[📗 Ver prácticas](./practica8/README.md) |
-|9|**Shaders**|Efecto Mandala|[📗 Ver prácticas](./practica9/README.md)|
+|9 & 10|**Shaders**|Efecto Mandala|[📒 Ver prácticas](./practica9/README.md)|
+|11|**Animación**|Angry Birds en 3D|[📙Ver prácticas](./practica11/README.md)|
 
 ---
 
