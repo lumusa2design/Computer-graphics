@@ -3223,36 +3223,15 @@ function killPigObject(obj, withFX) {
 
 El video del juego  se puede ver aquí:
 
-[video](https://youtu.be/W3NwYJGskkE)
+[video](https://youtu.be/Zv1VDAb97Qo)
 
 o puede intentar verlo aquí:
 
 <video controls width="600">
-  <source src="./media/generative_shader.webm" type="video/webm">
+  <source src="./media/angrybirds.mp4" type="video/mp4">
 </video>
 
-Y si no, se encuentra en la carpeta *media* del *README* de la práctica 9.
-
-
-El video del shader generativo reducido sería el siguiente:
-[video](https://youtu.be/DQUkxEr3-Bg)
-
-o puede intentar verlo aquí:
-
-<video controls width="600">
-  <source src="./media/tiny_generative_shader.webm" type="video/webm">
-</video>
-
-
-Y la versión reducida sería la siguiente:
-[video](https://youtu.be/qJV0AU4mPEA)
-
-o puede intentar verlo aquí:
-
-<video controls width="600">
-  <source src="./media/short_shader.webm" type="video/webm">
-</video>
-
+Y si no, se encuentra en la carpeta *media* del *README* de la práctica 10 .
 ## Autores y Reconocimiento
 
 
