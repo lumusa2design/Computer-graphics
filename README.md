@@ -14,6 +14,7 @@
 |8|**Visualización de datos**|Terremotos en EEUU|[📗 Ver prácticas](./practica8/README.md) |
 |9 & 10|**Shaders**|Efecto Mandala|[📒 Ver prácticas](./practica9/README.md)|
 |11|**Animación**|Angry Birds en 3D|[📙Ver prácticas](./practica11/README.md)|
+|Opcional|**Captura de Pokemons|[📚ver trabajo](./TrabajoOpcional/README.md)|
 
 ---
 
