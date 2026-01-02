@@ -2874,3 +2874,22 @@ public class PokedexEntry
 
 Gestiona la entrada ne la Pokédex y todo lo relacionado visualmente.
 
+### PokemonIdentity
+
+Establece, o sirve como clase base para los Pokemon.
+`PokemonIdentity.cs` 
+```cs
+using UnityEngine;
+
+public class PokemonIdentity : MonoBehaviour
+{
+    [Range(1, 10)] public int pokemonId;  
+    public string pokemonName;           
+    public PokemonType primaryType;
+}
+```
+Se define por:
+- El número de la *Pokedex*
+- Nombre del *Pokemon*
+- Tipo (defini agua, fuego, planta, eléctrico, volador, bicho, roca, tierra, metal y hielo).
+
