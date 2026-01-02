@@ -3392,6 +3392,7 @@ Además es donde finalmente se hace la animación de abrir y cerrar la retícula
 
 Este no tendrá explicación, porque era una ampliación en la que estaba trabajando, oriente esto como un mínimo viable y trabajo en cascada, en este caso, quería que los monstruos y las colisiones se calcularan para hacer más inmersiva la experiencia. 
 
+`RoomBoundMonsterSpawner.cs`
 ```cs
 using UnityEngine;
 using Meta.XR.MRUtilityKit;
@@ -3483,6 +3484,38 @@ public class RoomBoundMonsterSpawner : MonoBehaviour
                 return;
             }
         }
+    }
+}
+```
+
+
+### SimpleRayVisual
+
+Este me servía para depurar, porque no me funcionaba el *Toolkit* de Meta:
+
+```cs
+using UnityEngine;
+
+[RequireComponent(typeof(LineRenderer))]
+public class SimpleRayVisual : MonoBehaviour
+{
+    public float length = 5f;
+    LineRenderer lr;
+
+    void Awake()
+    {
+        lr = GetComponent<LineRenderer>();
+        lr.positionCount = 2;
+        lr.useWorldSpace = true;
+    }
+
+    void Update()
+    {
+        Vector3 start = transform.position;
+        Vector3 end = start + transform.forward * length;
+
+        lr.SetPosition(0, start);
+        lr.SetPosition(1, end);
     }
 }
 ```
