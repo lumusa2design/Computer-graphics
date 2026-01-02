@@ -2893,3 +2893,27 @@ Se define por:
 - Nombre del *Pokemon*
 - Tipo (defini agua, fuego, planta, eléctrico, volador, bicho, roca, tierra, metal y hielo).
 
+### PokemonType
+Crea los tipos
+
+`PokemonType.cs` 
+```cs
+public enum PokemonType
+{
+    Agua, 
+    Fuego, 
+    Planta, 
+    Electrico, 
+    Roca, 
+    Tierra, 
+    Volador, 
+    Bicho, 
+    Metal, 
+    Hielo
+}
+```
+
+Establece los tipos de *Pokemon* que hay esto iba a ser importante orque pensaba implementar un combate pero por tema de tiempo no he podido.
+
+
+
