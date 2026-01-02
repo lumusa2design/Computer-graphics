@@ -261,3 +261,33 @@ Esta función decide cuál es el *Pokemón* al que es más probale se apunte par
 ```
 
 Esto es para depuración permite ver el cono.
+
+### Música de fondo
+
+Existe un Script para gestionar la música que se escucha de fondo:
+
+`BackgroundMusic.cs` 
+```cs
+using UnityEngine;
+
+public class BackgroundMusic : MonoBehaviour
+{
+    public AudioSource musicSource;
+
+    void Awake()
+    {
+        DontDestroyOnLoad(gameObject);
+
+        if (!musicSource)
+            musicSource = GetComponent<AudioSource>();
+
+        if (musicSource && !musicSource.isPlaying)
+            musicSource.Play();
+    }
+}
+```
+
+Primero se declara el Audiosource que gestionará la música, se genera con *Awake* que se inicia antes de *Start* garantizando que funciona antes de que se inicialice la escena.
+
+Lo ideal es que el *MusicManager* lo gestione también el *GameManager* pero, en este caso, no existe puesto que no tenemos varias escenas. En su lugar usamos *PlayerPrefs*, para guardar elementos que se guarden entre sesiones.
+
