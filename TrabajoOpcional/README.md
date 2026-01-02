@@ -3519,3 +3519,20 @@ public class SimpleRayVisual : MonoBehaviour
     }
 }
 ```
+
+
+### TypeIconMap
+
+Para poder tener los íconos de los elementos a las criaturas.
+
+`TypeIconMap.cs`
+```cs
+using UnityEngine;
+
+[System.Serializable]
+public class TypeIconMap
+{
+    public PokemonType pokemonType;
+    public Sprite icon;
+}
+```
