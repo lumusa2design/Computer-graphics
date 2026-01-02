@@ -2087,3 +2087,158 @@ Obtiene la probabilidad de acierto a la hora de capturar.
 ```
 
 Comprueba que la colisión es un *Pokemón*.
+
+### Pokedex Data
+
+Es el sistema uqe tiene los datos de forma persistente.
+```cs
+using UnityEngine;
+
+public class PokedexData : MonoBehaviour
+{
+    public static PokedexData I;
+
+    [Header("IDs 1..10. El �ndice 0 se ignora.")]
+    public bool[] captured = new bool[11];
+
+    const string PrefKey = "POKEDEX_CAPTURED_MASK"; 
+
+    void Awake()
+    {
+        if (I != null && I != this) { Destroy(gameObject); return; }
+        I = this;
+        DontDestroyOnLoad(gameObject);
+
+        Load();
+    }
+
+    void Update()
+    {
+        if (OVRInput.GetDown(OVRInput.Button.Two))
+        {
+            ResetAll();
+            Debug.Log("[PokedexData] PlayerPrefs borrado y Pok�dex reseteada.");
+        }
+    }
+    public void RegisterCapture(int id)
+    {
+        if (id < 1 || id > 10) return;
+
+        bool was = captured[id];
+        captured[id] = true;
+
+        if (!was) Save(); 
+    }
+
+    public bool IsCaptured(int id)
+    {
+        return id >= 1 && id <= 10 && captured[id];
+    }
+
+    public int CapturedCount()
+    {
+        int c = 0;
+        for (int id = 1; id <= 10; id++)
+            if (captured[id]) c++;
+        return c;
+    }
+
+    public void Save()
+    {
+        int mask = 0;
+        for (int id = 1; id <= 10; id++)
+            if (captured[id]) mask |= (1 << id);
+
+        PlayerPrefs.SetInt(PrefKey, mask);
+        PlayerPrefs.Save();
+    }
+
+    public void Load()
+    {
+        int mask = PlayerPrefs.GetInt(PrefKey, 0);
+
+        for (int id = 1; id <= 10; id++)
+            captured[id] = (mask & (1 << id)) != 0;
+    }
+
+    public void ResetAll()
+    {
+        for (int id = 1; id <= 10; id++) captured[id] = false;
+        PlayerPrefs.DeleteKey("POKEDEX_CAPTURED_MASK");
+        PlayerPrefs.Save();
+    }
+}
+```
+
+Acontinuación analizamos:
+```cs
+    public void RegisterCapture(int id)
+    {
+        if (id < 1 || id > 10) return;
+
+        bool was = captured[id];
+        captured[id] = true;
+
+        if (!was) Save(); 
+    }
+```
+
+Registra la captura si está en la lista de *Pokemon* y no estaba de antes.
+
+```cs
+    public bool IsCaptured(int id)
+    {
+        return id >= 1 && id <= 10 && captured[id];
+    }
+```
+Devuelve si ha sido o no capturado.
+
+```cs
+    public int CapturedCount()
+    {
+        int c = 0;
+        for (int id = 1; id <= 10; id++)
+            if (captured[id]) c++;
+        return c;
+    }
+```
+
+Sigue la cantidad de *Pokemon* capturados (de la lista o sea 1/10, 6/10...)
+
+
+```cs
+    public void Save()
+    {
+        int mask = 0;
+        for (int id = 1; id <= 10; id++)
+            if (captured[id]) mask |= (1 << id);
+
+        PlayerPrefs.SetInt(PrefKey, mask);
+        PlayerPrefs.Save();
+    }
+```
+
+Guarda los nuevos capturados.
+
+```cs
+    public void Load()
+    {
+        int mask = PlayerPrefs.GetInt(PrefKey, 0);
+
+        for (int id = 1; id <= 10; id++)
+            captured[id] = (mask & (1 << id)) != 0;
+    }
+```
+
+carga la lista de Pokemons de PlayerPrefs.
+
+```cs
+    public void ResetAll()
+    {
+        for (int id = 1; id <= 10; id++) captured[id] = false;
+        PlayerPrefs.DeleteKey("POKEDEX_CAPTURED_MASK");
+        PlayerPrefs.Save();
+    }
+```
+
+Borra todos los pokemons capturados.
