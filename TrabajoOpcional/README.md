@@ -641,11 +641,49 @@ Si se mantiene la confirmación en las *Pokeball* se hace un *feedback*.
 Para la vibración.
 
 ```cs
-    }
-
     void StopHaptics()
     {
         OVRInput.SetControllerVibration(0, 0, OVRInput.Controller.LTouch);
     }
 ```
 Evita que al decrementar desde 0 salga -1 y rompa el *array*.
+
+### Ball Types
+
+Define los tipos de *Pokeball* disponibles en el sistema y la estructura básica que los vincula con sus prefabs de Unity.
+
+`BallTypes.cs`
+```cs
+using System;
+using UnityEngine;
+
+public enum BallType { Poke, Ultra, Safari, Master }
+
+[Serializable]
+public class BallEntry
+{
+    public BallType type;
+    public GameObject prefab;
+}
+```
+
+```cs
+public enum BallType { Poke, Ultra, Safari, Master }
+```
+Enumera de forma explicita los tipos de Pokeballs que hay.
+- *Pokeball*
+- *Ultraball*
+- *Safariball*
+- *Master*
+
+```cs
+[Serializable]
+public class BallEntry
+{
+    public BallType type;
+    public GameObject prefab;
+}
+```
+Esta clase actúa como una estructura de datos que relaciona:
+- Tipo
+- Prefab
