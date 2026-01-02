@@ -3536,3 +3536,36 @@ public class TypeIconMap
     public Sprite icon;
 }
 ```
+
+## Resultado
+El video se encuentra en el drive
+
+Se puede intentar mirar aquí o en el propio github, recomiendo ver el drive, ya que está el APK y el video completo por si se quiere ver toda la interacion con el usuairo
+
+<video controls width="600">
+  <source src="./Video_pokemon.mp4" type="video/webm">
+</video>
+
+
+
+## Autores y Reconocimiento
+
+
+<div align="center">
+
+[![Autor: lumusa2design](https://img.shields.io/badge/Autor-lumusa2design-8A36D2?style=for-the-badge&logo=github&logoColor=white)](https://github.com/lumusa2design)
+
+
+[![Docente: Profe](https://img.shields.io/badge/Docente-OTSEDOM-0E7AFE?style=for-the-badge&logo=googlescholar&logoColor=white)](https://github.com/otsedom)
+
+[![Centro: EII](https://img.shields.io/badge/Centro-Escuela%20de%20Ingenier%C3%ADa%20Inform%C3%A1tica-00A86B?style=for-the-badge)](https://www.eii.ulpgc.es/es)
+
+</div>
+
+
+--- 
+## Recursos usados
+Estoy recopilando toda la información
+
+
+
