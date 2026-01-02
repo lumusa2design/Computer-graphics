@@ -1428,4 +1428,173 @@ public static class OneShotAudio3D
 ```
 Gestiona todo el sonido y reproduce un sonido según la distancia, y del efecto que se quiera transmitir.
 
+### PokeballAutoDestroy
+
+Genera la autodestrucción de la Pokeball para no sobrecargar la escena con Pokeballs.
+
+`PokeballAutoDestroy.cs`
+```cs
+using UnityEngine;
+
+public class PokeballAutoDestroy : MonoBehaviour
+{
+    [Header("Destroy conditions")]
+    [Tooltip("Se destruye pase lo que pase tras X segundos desde que spawnea. 0 = desactivado")]
+    public float destroyAfterSeconds = 0f; 
+
+    [Tooltip("Se destruye al colisionar con objetos de estas layers")]
+    public LayerMask groundLayers;
+
+    [Tooltip("Alternativa a layers: si no est� vac�o, se considera suelo si toca un objeto con este tag")]
+    public string groundTag = "Ground";
+
+    [Header("On ground behavior")]
+    [Tooltip("Tiempo tras tocar suelo antes de destruirse")]
+    public float destroyDelayAfterGroundHit = 12.0f;
+
+    [Tooltip("Evita dobles destrucciones")]
+    public bool onlyFirstGroundHit = true;
+
+    [Header("Debug")]
+    public bool debugLogs = false;
+
+    bool groundHitTriggered;
+    float spawnTime;
+
+    void Start()
+    {
+        spawnTime = Time.time;
+        if (destroyAfterSeconds > 0f)
+        {
+            if (debugLogs) Debug.Log($"[AutoDestroy] Scheduled from spawn: {destroyAfterSeconds}s ({name})");
+            Destroy(gameObject, destroyAfterSeconds);
+        }
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (!enabled) return;
+        if (groundHitTriggered && onlyFirstGroundHit) return;
+
+        if (!IsGround(collision.gameObject)) return;
+
+        groundHitTriggered = true;
+
+ 
+
+        float desired = destroyDelayAfterGroundHit;
+
+        if (desired <= 0f)
+        {
+            if (debugLogs) Debug.Log($"[AutoDestroy] Destroy NOW on ground hit ({name})");
+            Destroy(gameObject);
+            return;
+        }
+
+        if (debugLogs)
+        {
+            float timeAlive = Time.time - spawnTime;
+            Debug.Log($"[AutoDestroy] Ground hit at t={timeAlive:F2}s -> destroy in {desired:F2}s ({name})");
+        }
+
+        Destroy(gameObject, desired);
+    }
+
+    bool IsGround(GameObject other)
+    {
+        if (!string.IsNullOrEmpty(groundTag) && other.CompareTag(groundTag))
+            return true;
+
+        if (groundLayers.value != 0)
+        {
+            int bit = 1 << other.layer;
+            if ((groundLayers.value & bit) != 0) return true;
+        }
+
+        return false;
+    }
+}
+```
+
+#### Inicialización de las variables y *Headers*
+
+```cs
+    [Header("Destroy conditions")]
+    [Tooltip("Se destruye pase lo que pase tras X segundos desde que spawnea. 0 = desactivado")]
+    public float destroyAfterSeconds = 0f; 
+
+    [Tooltip("Se destruye al colisionar con objetos de estas layers")]
+    public LayerMask groundLayers;
+
+    [Tooltip("Alternativa a layers: si no est� vac�o, se considera suelo si toca un objeto con este tag")]
+    public string groundTag = "Ground";
+
+    [Header("On ground behavior")]
+    [Tooltip("Tiempo tras tocar suelo antes de destruirse")]
+    public float destroyDelayAfterGroundHit = 12.0f;
+
+    [Tooltip("Evita dobles destrucciones")]
+    public bool onlyFirstGroundHit = true;
+
+    [Header("Debug")]
+    public bool debugLogs = false;
+
+    bool groundHitTriggered;
+    float spawnTime;
+``` 
+
+Despues de todas las configuraciones e inicializaciones alguna por inspector:
+
+```cs
+    void OnCollisionEnter(Collision collision)
+    {
+        if (!enabled) return;
+        if (groundHitTriggered && onlyFirstGroundHit) return;
+
+        if (!IsGround(collision.gameObject)) return;
+
+        groundHitTriggered = true;
+
+ 
+
+        float desired = destroyDelayAfterGroundHit;
+
+        if (desired <= 0f)
+        {
+            if (debugLogs) Debug.Log($"[AutoDestroy] Destroy NOW on ground hit ({name})");
+            Destroy(gameObject);
+            return;
+        }
+
+        if (debugLogs)
+        {
+            float timeAlive = Time.time - spawnTime;
+            Debug.Log($"[AutoDestroy] Ground hit at t={timeAlive:F2}s -> destroy in {desired:F2}s ({name})");
+        }
+
+        Destroy(gameObject, desired);
+    }
+```
+Gestiona la autodestrucción con colisión en el suelo. Lo desactive porque me daba problemas. También detecta el tiempo en el que ha estado.
+
+```cs
+    bool IsGround(GameObject other)
+    {
+        if (!string.IsNullOrEmpty(groundTag) && other.CompareTag(groundTag))
+            return true;
+
+        if (groundLayers.value != 0)
+        {
+            int bit = 1 << other.layer;
+            if ((groundLayers.value & bit) != 0) return true;
+        }
+
+        return false;
+    }
+```
+
+Detecta si el objeto con el que colisiona, es suelo o no.
+
+
+
 
