@@ -1023,4 +1023,74 @@ Pega la Pokeball selecionada a la mano
     }
 ```
 
-Suelta y reactiva las físicas a la Pokeball
+Suelta y reactiva las físicas a la Pokeball.
+
+## MonsterRespawn
+
+Genera los monstruos al rededor del jugador de forma aleatoria.
+
+```cs
+using UnityEngine;
+
+public class MonsterRespawn : MonoBehaviour
+{
+    Vector3 originalPos;
+    Quaternion originalRot;
+
+    void Awake()
+    {
+        CaptureOriginNow();
+    }
+
+    public void CaptureOriginNow()
+    {
+        originalPos = transform.position;
+        originalRot = transform.rotation;
+    }
+
+    public void HideForCapture()
+    {
+        gameObject.SetActive(false);
+    }
+
+    public void RespawnAtOrigin()
+    {
+        gameObject.SetActive(true);
+        transform.SetPositionAndRotation(originalPos, originalRot);
+    }
+}
+```
+
+```cs
+    void Awake()
+    {
+        CaptureOriginNow();
+    }
+```
+Inicializa el *Spawner* antes del Start, estando al inicio de la escena.
+
+```cs
+    public void CaptureOriginNow()
+    {
+        originalPos = transform.position;
+        originalRot = transform.rotation;
+    }
+```
+Actualiza manualmente el punto de *spawn* 
+
+```cs
+public void HideForCapture()
+{
+    gameObject.SetActive(false);
+}
+```
+Desactiva al *Pokemón* al ser capturado.
+
+```cs
+public void RespawnAtOrigin()
+{
+    gameObject.SetActive(true);
+    transform.SetPositionAndRotation(originalPos, originalRot);
+}
+```
+Si la Captura falla, vuelve a aparecer el *Pokemón*.
