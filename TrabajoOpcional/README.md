@@ -2279,3 +2279,76 @@ public class PokedexListItem : MonoBehaviour
 ```
 
 SetCaptured lo que hace es cargar los *Pokemon* y actualiza la información de los que si han sido capturados.
+
+### PokedexToast
+
+Genera un mensaje temporal cuando ha sido capturado de si existía o no en la Pokedex.
+
+```cs
+using System.Collections;
+using UnityEngine;
+using TMPro;
+
+public class PokedexToast : MonoBehaviour
+{
+    public TMP_Text text;
+    public CanvasGroup canvasGroup;
+    public float showSeconds = 1.2f;
+
+    Coroutine co;
+
+    public void Show(string msg)
+    {
+        if (co != null) StopCoroutine(co);
+        co = StartCoroutine(Run(msg));
+    }
+
+    IEnumerator Run(string msg)
+    {
+        if (text) text.text = msg;
+        if (canvasGroup)
+        {
+            canvasGroup.alpha = 1f;
+            canvasGroup.blocksRaycasts = false;
+            canvasGroup.interactable = false;
+        }
+        else gameObject.SetActive(true);
+
+        yield return new WaitForSeconds(showSeconds);
+
+        if (canvasGroup) canvasGroup.alpha = 0f;
+        else gameObject.SetActive(false);
+    }
+}
+```
+
+Tenemos dos métodos principales:
+```cs
+    public void Show(string msg)
+    {
+        if (co != null) StopCoroutine(co);
+        co = StartCoroutine(Run(msg));
+    }
+```
+Muestra toa la información de si ha sido o no registrado.
+
+```cs
+    IEnumerator Run(string msg)
+    {
+        if (text) text.text = msg;
+        if (canvasGroup)
+        {
+            canvasGroup.alpha = 1f;
+            canvasGroup.blocksRaycasts = false;
+            canvasGroup.interactable = false;
+        }
+        else gameObject.SetActive(true);
+
+        yield return new WaitForSeconds(showSeconds);
+
+        if (canvasGroup) canvasGroup.alpha = 0f;
+        else gameObject.SetActive(false);
+    }
+```
+Activa/Desativa el marco.
+
